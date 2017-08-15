@@ -9,6 +9,7 @@
 * Executable
 * Background process
 * Settings dialog / file
+* Multiple OS compatibility
 
 
 
