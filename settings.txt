@@ -11,12 +11,12 @@ Flavour = NASA
 *
 *
 
-Change frequency = 5
+Change frequency = 0
 
 *in minutes
 *
 
-Keep used wallpapers = 0
+Keep used wallpapers = 1
 
 Custom save location = 0
 Path = c:\Users\Rokas\Google Drive\# Work\Programs\wallpapercrawler\papes\
