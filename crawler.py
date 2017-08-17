@@ -4,20 +4,20 @@ import os
 
 from random import randint
 from time import sleep
+from configparser import ConfigParser
 
 # Pillow?
 
 
-setfile = open('settings.txt', "r")
-settings = setfile.readlines()
-setfile.close()
+config = ConfigParser()
+config.read('settings.ini')
 
-res = settings[0][13:].split('\n')[0]
-flavour = settings[7][10:].split('\n')[0]
-frequency = float(settings[13][19:])*60
-keep = bool(int(settings[18][23:]))
-custom = bool(int(settings[20][23:]))
-custompath = settings[21][7:].split('\n')[0]
+res =  config.get('settings', 'Resolution').split('\n')[0]
+flavour = config.get('settings', 'Flavour').split('\n')[0]
+frequency = config.getfloat('settings', 'Change_frequency')*60
+keep = config.getboolean('settings', 'Keep_used_wallpapers')
+custom = config.getboolean('settings', 'Custom_save_location')
+custompath = config.get('settings', 'Path').split('\n')[0]
 
 print res
 print flavour
