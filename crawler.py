@@ -10,25 +10,9 @@ from configparser import ConfigParser
 # Pillow?
 
 
-# Getting settings from the .ini file
-config = ConfigParser()
-config.read('settings.ini')
+def wall_setter(res, flavour, keep, custom, custompath):
 
-res =  config.get('settings', 'Resolution').split('\n')[0]
-flavour = config.get('settings', 'Flavour').split('\n')[0]
-frequency = config.getfloat('settings', 'Change_frequency')*60
-keep = config.getboolean('settings', 'Keep_used_wallpapers')
-custom = config.getboolean('settings', 'Custom_save_location')
-custompath = config.get('settings', 'Path').split('\n')[0]
-running = config.getboolean('process', 'LOOP')
-
-
-
-
-noimage = True
-
-def wall_setter(string res, string flavour, bool keep, bool custom, string custompath, bool running):
-
+    noimage = True
     while (noimage):
 
         if (flavour=="NASA"):
@@ -36,9 +20,10 @@ def wall_setter(string res, string flavour, bool keep, bool custom, string custo
             url ="https://www.jpl.nasa.gov/spaceimages/images/wallpaper/PIA" + num + "-" + res + ".jpg"
             # TODO: make url less random
             check = urllib.urlopen(url)
-            print check.getcode()
+            print 'Searching...'
 
             if (check.getcode()!=404):
+                print 'Done!'
                 imgname = num + ".jpg"
                 if (custom):
                     path = custompath
@@ -53,13 +38,5 @@ def wall_setter(string res, string flavour, bool keep, bool custom, string custo
                 if (not(keep)):
                     os.remove(imgpath)
                 noimage = False
-
-    return
-
-def loop(float frequency):
-
-    while (running):
-        wall_setter()
-        sleep(frequency)
 
     return
