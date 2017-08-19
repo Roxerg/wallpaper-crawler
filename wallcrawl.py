@@ -27,6 +27,14 @@ custompath = config.get('settings', 'Path').split('\n')[0]
 running = config.getboolean('process', 'LOOP')
 
 
+def looper(file, running, res, flavour, keep, custom, custompath):
+    while (running):
+        config.read('settings.ini')
+        running = config.getboolean('process', 'LOOP')
+        crawler.wall_setter(res, flavour, keep, custom, custompath)
+        sleep(frequency)
+    
+
 def main():
 
     command = ''
@@ -61,7 +69,9 @@ def main():
         with open('settings.ini', 'w') as configfile:
             config.write(configfile)
             
-        os.system("wallcrawlloop.pyw")
+        #os.system("wallcrawlloop.pyw")
+        crawlloop = multiprocessing.Process(target=looper('wallcrawlloop.pyw', running, res, flavour, keep, custom, custompath))
+        crawlloop.start()
 
     elif (command == 's'):
         crawler.wall_setter(res, flavour, keep, custom, custompath)
