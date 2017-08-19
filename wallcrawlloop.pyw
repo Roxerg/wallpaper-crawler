@@ -15,7 +15,6 @@ custompath = config.get('settings', 'Path').split('\n')[0]
 running = config.getboolean('process', 'LOOP')
 
 
-
 while (running):
     config.read('settings.ini')
     running = config.getboolean('process', 'LOOP')
