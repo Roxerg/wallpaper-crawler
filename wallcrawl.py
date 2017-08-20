@@ -13,7 +13,6 @@ from configparser import ConfigParser
 #local
 import crawler
 
-
 # Getting settings from the .ini file
 config = ConfigParser()
 config.read('settings.ini')
@@ -36,9 +35,6 @@ def looper(file, running, res, flavour, keep, custom, custompath):
     
 
 def main():
-
-    command = ''
-    command = raw_input(">>")
 
     if (command == 'h'):
         print """ 
