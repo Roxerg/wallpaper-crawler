@@ -13,6 +13,7 @@ from configparser import ConfigParser
 #local
 import crawler
 
+
 # Getting settings from the .ini file
 config = ConfigParser()
 config.read('settings.ini')
@@ -36,6 +37,9 @@ def looper(file, running, res, flavour, keep, custom, custompath):
 
 def main():
 
+    command = ''
+    command = raw_input(">> ")
+
     if (command == 'h'):
         print """ 
         edit the settings.ini file to choose whether to
@@ -48,7 +52,7 @@ def main():
         print "    h - this dialog"
         print "    l - start or stop the loop that keeps replacing wallpapers"
         print "    s - set a new wallpaper now"
-        print "    q - exit (keeping the loop)\n"
+        print "    q - exit"
 
 
     elif (command == 'l'):
@@ -65,9 +69,7 @@ def main():
         with open('settings.ini', 'w') as configfile:
             config.write(configfile)
             
-        #os.system("wallcrawlloop.pyw")
-        crawlloop = multiprocessing.Process(target=looper('wallcrawlloop.pyw', running, res, flavour, keep, custom, custompath))
-        crawlloop.start()
+        os.system("wallcrawlloop.pyw")
 
     elif (command == 's'):
         crawler.wall_setter(res, flavour, keep, custom, custompath)

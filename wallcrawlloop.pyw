@@ -18,8 +18,9 @@ running = config.getboolean('process', 'LOOP')
 while (running):
     config.read('settings.ini')
     running = config.getboolean('process', 'LOOP')
-    crawler.wall_setter(res, flavour, keep, custom, custompath)
-    sleep(frequency)
+    if (running):
+        crawler.wall_setter(res, flavour, keep, custom, custompath)
+        sleep(frequency)
 
 
 
