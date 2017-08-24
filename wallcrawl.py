@@ -33,7 +33,37 @@ def looper(file, running, res, flavour, keep, custom, custompath):
         running = config.getboolean('process', 'LOOP')
         crawler.wall_setter(res, flavour, keep, custom, custompath)
         sleep(frequency)
-    
+
+def wall_setter(res, flavour, keep, custom, custompath):
+
+    noimage = True
+    while (noimage):
+
+        if (flavour=="NASA"):
+            num = "%0.5d" % randint(0, 21000)
+            url ="https://www.jpl.nasa.gov/spaceimages/images/wallpaper/PIA" + num + "-" + res + ".jpg"
+            # TODO: make url less random
+            check = urllib.urlopen(url)
+            print 'Searching...'
+
+            if (check.getcode()!=404):
+                print 'Done!'
+                imgname = num + ".jpg"
+                if (custom):
+                    path = custompath
+                else:   
+                    path = os.path.dirname(os.path.realpath(__file__)) + "/papes/"
+                imgpath = path + imgname
+
+                urllib.urlretrieve(url, imgpath)
+
+                SPI_SETDESKWALLPAPER = 20
+                ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, imgpath, 3)
+                if (not(keep)):
+                    os.remove(imgpath)
+                noimage = False
+
+    return
 
 def main():
 
@@ -50,7 +80,8 @@ def main():
 
             """
         print "    h - this dialog"
-        print "    l - start or stop the loop that keeps replacing wallpapers"
+        print "    l - toggle loop"
+        print "    la - launch loop, making you not able to enter commands cuz i suck"
         print "    s - set a new wallpaper now"
         print "    q - exit"
 
@@ -69,6 +100,8 @@ def main():
         with open('settings.ini', 'w') as configfile:
             config.write(configfile)
             
+
+    elif (command == 'la'):
         os.system("wallcrawlloop.pyw")
 
     elif (command == 's'):
