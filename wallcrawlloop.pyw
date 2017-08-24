@@ -1,4 +1,4 @@
-import crawler
+import wallcrawl
 
 from time import sleep
 from configparser import ConfigParser
@@ -19,7 +19,7 @@ while (running):
     config.read('settings.ini')
     running = config.getboolean('process', 'LOOP')
     if (running):
-        crawler.wall_setter(res, flavour, keep, custom, custompath)
+        wallcrawl.wall_setter(res, flavour, keep, custom, custompath)
         sleep(frequency)
 
 
