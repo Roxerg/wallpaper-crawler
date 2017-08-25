@@ -3,6 +3,8 @@ import ctypes
 import os
 import multiprocessing
 
+from sys import platform
+
 # from Tkinter import *
 from random import randint
 from time import sleep
@@ -10,8 +12,6 @@ from configparser import ConfigParser
 
 # Pillow?
 
-#local
-import crawler
 
 
 # Getting settings from the .ini file
@@ -57,8 +57,32 @@ def wall_setter(res, flavour, keep, custom, custompath):
 
                 urllib.urlretrieve(url, imgpath)
 
-                SPI_SETDESKWALLPAPER = 20
-                ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, imgpath, 3)
+                if platform.startswith("win"):
+                    SPI_SETDESKWALLPAPER = 20
+                    ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, imgpath, 3)
+                elif platform.startswith("linux"):
+                    import gconf
+                    import os
+                    envir = os.environ.get('DESKTOP_SESSION')
+                    #https://stackoverflow.com/a/21213358/8439299
+
+
+
+
+                    conf = gconf.client_get_default()
+                    gnomepath = "/desktop/gnome/background/" + imgname
+                    conf.set_string(gnomepath, imgpath)
+                elif platform.startswith("darwin"):
+                    import subprocess
+
+                    SCRIPT = """/usr/bin/osascript<<END
+                    tell application "Finder"
+                    set desktop picture to POSIX file "%s"
+                    end tell
+                    END"""
+
+                    subprocess.Popen(SCRIPT%imgpath, shell=True)
+
                 if (not(keep)):
                     os.remove(imgpath)
                 noimage = False
