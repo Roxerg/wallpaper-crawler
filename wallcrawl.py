@@ -1,7 +1,8 @@
 import urllib
 import ctypes
 import os
-import multiprocessing
+#import multiprocessing
+#import re
 
 from sys import platform
 
@@ -12,82 +13,105 @@ from configparser import ConfigParser
 
 # Pillow?
 
+class Wall:
+
+    # Getting settings from the .ini file
+    config = ConfigParser()
+    config.read('settings.ini')
+
+    res =  config.get('settings', 'Resolution').split('\n')[0]
+    flavour = config.get('settings', 'Flavour').split('\n')[0]
+    frequency = config.getfloat('settings', 'Change_frequency')*60
+    keep = config.getboolean('settings', 'Keep_used_wallpapers')
+    custom = config.getboolean('settings', 'Custom_save_location')
+    custompath = config.get('settings', 'Path').split('\n')[0]
+    running = config.getboolean('process', 'LOOP')
+    imgpath = ""
 
 
-# Getting settings from the .ini file
-config = ConfigParser()
-config.read('settings.ini')
+    def looper(self):
+        while (self.running):
+            self.config.read('settings.ini')
+            running = self.config.getboolean('process', 'LOOP')
+            self.wall_setter()
+            sleep(self.frequency)
 
-res =  config.get('settings', 'Resolution').split('\n')[0]
-flavour = config.get('settings', 'Flavour').split('\n')[0]
-frequency = config.getfloat('settings', 'Change_frequency')*60
-keep = config.getboolean('settings', 'Keep_used_wallpapers')
-custom = config.getboolean('settings', 'Custom_save_location')
-custompath = config.get('settings', 'Path').split('\n')[0]
-running = config.getboolean('process', 'LOOP')
+    def wall_setter(self):
 
+        noimage = True
+        self.downloader()
+        self.wallpapersetter()
 
-def looper(file, running, res, flavour, keep, custom, custompath):
-    while (running):
-        config.read('settings.ini')
-        running = config.getboolean('process', 'LOOP')
-        crawler.wall_setter(res, flavour, keep, custom, custompath)
-        sleep(frequency)
+        return
 
-def wall_setter(res, flavour, keep, custom, custompath):
+    def downloader(self):
 
-    noimage = True
-    while (noimage):
+        # TODO: this whole thing
+        if (self.flavour=="NASAsite"):
+            noimage = True
+            while (noimage):
+                num = "%0.5d" % randint(0, 21000)
+                url ="https://www.jpl.nasa.gov/spaceimages/images/wallpaper/PIA" + num + "-" + self.res + ".jpg"
+                # TODO: make url less random
+                check = urllib.urlopen(url)
+                print 'Searching...'
 
-        if (flavour=="NASA"):
-            num = "%0.5d" % randint(0, 21000)
-            url ="https://www.jpl.nasa.gov/spaceimages/images/wallpaper/PIA" + num + "-" + res + ".jpg"
-            # TODO: make url less random
-            check = urllib.urlopen(url)
-            print 'Searching...'
+                if (check.getcode()!=404):
+                    print 'Done!'
+                    imgname = num + ".jpg"
+                    if (self.custom):
+                        path = self.custompath
+                    else:   
+                        path = os.path.dirname(os.path.realpath(__file__)) + "/papes/"
+                    imgpath = path + imgname
 
-            if (check.getcode()!=404):
-                print 'Done!'
-                imgname = num + ".jpg"
-                if (custom):
-                    path = custompath
-                else:   
-                    path = os.path.dirname(os.path.realpath(__file__)) + "/papes/"
-                imgpath = path + imgname
+                    urllib.urlretrieve(url, imgpath)
 
-                urllib.urlretrieve(url, imgpath)
-
-                if platform.startswith("win"):
-                    SPI_SETDESKWALLPAPER = 20
-                    ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, imgpath, 3)
-                elif platform.startswith("linux"):
-                    import gconf
-                    import os
-                    envir = os.environ.get('DESKTOP_SESSION')
-                    #https://stackoverflow.com/a/21213358/8439299
+                    noimage = False
+                    self.imgpath = imgpath
+                    print self.imgpath
 
 
 
+        elif (self.flavour=="4chan"):
+                #flavour =  re.sub(r'[^a-zA-Z0-9\s]+', '', title).replace(" ", "-")
+                print "Not implemented... "
+                sleep(2)
+                print "...yet!"
 
-                    conf = gconf.client_get_default()
-                    gnomepath = "/desktop/gnome/background/" + imgname
-                    conf.set_string(gnomepath, imgpath)
-                elif platform.startswith("darwin"):
-                    import subprocess
+    def wallpapersetter(self):
 
-                    SCRIPT = """/usr/bin/osascript<<END
-                    tell application "Finder"
-                    set desktop picture to POSIX file "%s"
-                    end tell
-                    END"""
+        if platform.startswith("win"):
+            SPI_SETDESKWALLPAPER = 20
+            ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, self.imgpath, 3)
+        elif platform.startswith("linux"):
+            import gconf
+            envir = os.environ.get('DESKTOP_SESSION')
+            #https://stackoverflow.com/a/21213358/8439299
 
-                    subprocess.Popen(SCRIPT%imgpath, shell=True)
 
-                if (not(keep)):
-                    os.remove(imgpath)
-                noimage = False
 
-    return
+
+            conf = gconf.client_get_default()
+            gnomepath = "/desktop/gnome/background/currentwall.jpg" 
+            conf.set_string(gnomepath, self.imgpath)
+        elif platform.startswith("darwin"):
+            import subprocess
+
+            SCRIPT = """/usr/bin/osascript<<END
+                        tell application "Finder"
+                        set desktop picture to POSIX file "%s"
+                        end tell
+                        END"""
+
+            subprocess.Popen(SCRIPT%self.imgpath, shell=True)
+
+        if (not(self.keep)):
+            os.remove(self.imgpath)
+
+
+    
+
 
 def main():
 
@@ -112,24 +136,25 @@ def main():
 
     elif (command == 'l'):
 
-        running = config.getboolean('process', 'LOOP')
+        running = Wall.config.getboolean('process', 'LOOP')
 
         if (running):
             print "Disabled!"
-            config.set('process', 'LOOP', 'False')
+            Wall.config.set('process', 'LOOP', 'False')
         else: 
             print "Enabled!"
-            config.set('process', 'LOOP', 'True')
+            Wall.config.set('process', 'LOOP', 'True')
         
         with open('settings.ini', 'w') as configfile:
-            config.write(configfile)
+            Wall.config.write(configfile)
             
 
     elif (command == 'la'):
         os.system("wallcrawlloop.pyw")
 
     elif (command == 's'):
-        crawler.wall_setter(res, flavour, keep, custom, custompath)
+        WallObject = Wall()
+        WallObject.wall_setter()
 
     elif (command == 'q'):
         print "Bye!"
@@ -138,9 +163,13 @@ def main():
 
     main()
 
+if __name__ == "__main__":
+    print "Wallpaper Crawler 0.1. write h for help"
+    main()
 
-print "Wallpaper Crawler 0.1. write h for help"
-main()
+
+
+
 
 
 
