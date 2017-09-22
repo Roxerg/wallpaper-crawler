@@ -1,8 +1,8 @@
-import urllib, logging
+import urllib
 import ctypes
 import os
 #import multiprocessing
-import re
+#import re
 
 from sys import platform
 
@@ -10,8 +10,6 @@ from sys import platform
 from random import randint
 from time import sleep
 from configparser import ConfigParser
-
-from multiprocessing import Process
 
 # Pillow?
 
@@ -40,6 +38,7 @@ class Wall:
 
     def wall_setter(self):
 
+        noimage = True
         self.downloader()
         self.wallpapersetter()
 
@@ -72,14 +71,20 @@ class Wall:
                     self.imgpath = imgpath
                     print self.imgpath
 
+
+
+        elif (self.flavour=="4chan"):
+                #flavour =  re.sub(r'[^a-zA-Z0-9\s]+', '', title).replace(" ", "-")
+                print "Not implemented... "
+                sleep(2)
+                print "...yet!"
+
     def wallpapersetter(self):
 
         if platform.startswith("win"):
             SPI_SETDESKWALLPAPER = 20
             ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, self.imgpath, 3)
         elif platform.startswith("linux"):
-
-            # it's supposed to work for at least one desktop environment
             import gconf
             envir = os.environ.get('DESKTOP_SESSION')
             #https://stackoverflow.com/a/21213358/8439299
@@ -105,10 +110,6 @@ class Wall:
             os.remove(self.imgpath)
 
 
-    # after that find next:
-    start = '<div class="teaser">'
-    end = '</div>'
-
     
 
 
@@ -123,7 +124,7 @@ def main():
         save used wallpapers,where to save them, how 
         frequently should the wallpapers change, what 
         should their resolution be and what type of 
-        wallpaper you want.
+        wallpaper you want (currently only 1 choice)
 
             """
         print "    h - this dialog"
